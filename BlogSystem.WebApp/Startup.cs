@@ -1,5 +1,8 @@
-﻿using Microsoft.Owin;
+﻿using BlogSystem.Data;
+using BlogSystem.Data.Migrations;
+using Microsoft.Owin;
 using Owin;
+using System.Data.Entity;
 
 [assembly: OwinStartupAttribute(typeof(BlogSystem.WebApp.Startup))]
 namespace BlogSystem.WebApp
@@ -8,6 +11,9 @@ namespace BlogSystem.WebApp
     {
         public void Configuration(IAppBuilder app)
         {
+            Database.SetInitializer(
+                new MigrateDatabaseToLatestVersion<BlogDbContext, Configuration>());
+
             ConfigureAuth(app);
         }
     }
