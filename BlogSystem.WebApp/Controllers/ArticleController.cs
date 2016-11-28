@@ -93,7 +93,10 @@
 
             using (var database = new BlogDbContext())
             {
-                var article = database.Articles.Where(a => a.Id == id).Include(a => a.Author).First();
+                var article = database.Articles
+                    .Where(a => a.Id == id)
+                    .Include(a => a.Author)
+                    .First();
 
                 if (article == null)
                 {
@@ -117,7 +120,10 @@
 
             using (var database = new BlogDbContext())
             {
-                var article = database.Articles.Where(a => a.Id == id).Include(a => a.Author).First();
+                var article = database.Articles
+                    .Where(a => a.Id == id)
+                    .Include(a => a.Author)
+                    .First();
 
                 if (article == null)
                 {
