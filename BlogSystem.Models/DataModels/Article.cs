@@ -1,5 +1,4 @@
 ﻿using BlogSystem.Models.Identity;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -21,5 +20,10 @@ namespace BlogSystem.Models.DataModels
         public string AuthorId { get; set; }
 
         public virtual ApplicationUser Author { get; set; }
+
+        public bool IsAuthor(string name)
+        {
+            return this.Author.UserName.Equals(name);
+        }
     }
 }

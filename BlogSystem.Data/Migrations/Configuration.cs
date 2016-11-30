@@ -39,6 +39,7 @@ namespace BlogSystem.Data.Migrations
             var user = context.Users.Where(u => u.Email == email).First();
 
             var result = userManager.AddToRole(user.Id, role);
+
             if (!result.Succeeded)
             {
                 throw new Exception(string.Join(";", result.Errors));
@@ -47,9 +48,11 @@ namespace BlogSystem.Data.Migrations
 
         private void CreateUser(BlogDbContext context, string email, string fullName, string password)
         {
+            // Create user manager
             var userManager = new UserManager<ApplicationUser>(
                 new UserStore<ApplicationUser>(context));
 
+            // Set user manager password validator
             userManager.PasswordValidator = new PasswordValidator
             {
                 RequiredLength = 1,
@@ -59,6 +62,7 @@ namespace BlogSystem.Data.Migrations
                 RequireUppercase = false,
             };
 
+            // Create user object
             var admin = new ApplicationUser
             {
                 UserName = email,
@@ -66,7 +70,10 @@ namespace BlogSystem.Data.Migrations
                 Email = email,
             };
 
+            // Create user
             var result = userManager.Create(admin, password);
+
+            // Validate result
             if (!result.Succeeded)
             {
                 throw new Exception(string.Join(";", result.Errors));

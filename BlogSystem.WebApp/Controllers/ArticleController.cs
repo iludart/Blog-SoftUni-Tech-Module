@@ -23,7 +23,11 @@
         {
             using (var database = new BlogDbContext())
             {
-                var articles = database.Articles.Include(a => a.Author).ToList();
+                // Get articles from database
+                var articles = database.Articles
+                    .Include(a => a.Author)
+                    .ToList();
+
                 return View(articles);
             }
         }
@@ -39,7 +43,10 @@
 
             using (var database = new BlogDbContext())
             {
-                var article = database.Articles.Where(a => a.Id == id).Include(a => a.Author).First();
+                var article = database.Articles
+                    .Where(a => a.Id == id)
+                    .Include(a => a.Author)
+                    .First();
 
                 if (article == null)
                 {
@@ -66,12 +73,16 @@
             {
                 using (var database = new BlogDbContext())
                 {
+                    // Get author id
                     var authorId = database.Users
                         .Where(u => u.UserName == this.User.Identity.Name)
                         .First()
                         .Id;
 
+                    // Set articles author
                     article.AuthorId = authorId;
+
+                    // Save article in DB
                     database.Articles.Add(article);
                     database.SaveChanges();
 
@@ -98,6 +109,11 @@
                     .Include(a => a.Author)
                     .First();
 
+                if (! IsUserAuthorizedToEdit(article))
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+                }
+
                 if (article == null)
                 {
                     return HttpNotFound();
@@ -120,16 +136,19 @@
 
             using (var database = new BlogDbContext())
             {
+                // Get article from db
                 var article = database.Articles
                     .Where(a => a.Id == id)
                     .Include(a => a.Author)
                     .First();
 
+                // Check if article exists
                 if (article == null)
                 {
                     return HttpNotFound();
                 }
 
+                // Remove article from db
                 database.Articles.Remove(article);
                 database.SaveChanges();
 
@@ -179,6 +198,11 @@
                         .Where(a => a.Id == id)
                         .First();
 
+                    if (!IsUserAuthorizedToEdit(article))
+                    {
+                        return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+                    }
+
                     article.Title = editedArticle["Title"];
                     article.Content = editedArticle["Content"];
                     database.Entry(article).State = EntityState.Modified;
@@ -189,6 +213,14 @@
             }
 
             return View(editedArticle);
+        }
+
+        private bool IsUserAuthorizedToEdit(Article article)
+        {
+            bool isAdmin = this.User.IsInRole("Admin");
+            bool isAuthor = article.IsAuthor(this.User.Identity.Name);
+
+            return isAdmin || isAuthor;
         }
     }
 }

@@ -151,16 +151,18 @@ namespace BlogSystem.WebApp.Controllers
             {
                 var user = new ApplicationUser { UserName = model.Email, FullName = model.FullName, Email = model.Email };
 
-                var userCreateResult = await UserManager.CreateAsync(user, model.Password);
+                var result = await UserManager.CreateAsync(user, model.Password);
+
                 var addRoleResult = this.UserManager.AddToRole(user.Id, "User");
 
-                if (userCreateResult.Succeeded && addRoleResult.Succeeded)
+                if (result.Succeeded && addRoleResult.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
                     return RedirectToAction("Index", "Home");
                 }
 
-                AddErrors(userCreateResult);
+                AddErrors(result);
+                AddErrors(addRoleResult);
             }
 
             return View(model);
